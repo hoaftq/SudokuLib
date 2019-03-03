@@ -5,6 +5,8 @@
     <Authors>hoaftq</Authors>
     <Product>SodokuLib</Product>
     <Company />
+    <PackageId>SodokuLib_hoaftq</PackageId>
+    <PackageTags>Sudoku game, generating Sudoku boards, Sudoku library</PackageTags>
   </PropertyGroup>
 
 </Project>
