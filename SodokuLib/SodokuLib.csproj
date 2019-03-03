@@ -1,12 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard1.0</TargetFramework>
     <Authors>hoaftq</Authors>
     <Product>SodokuLib</Product>
     <Company />
     <PackageId>SodokuLib_hoaftq</PackageId>
     <PackageTags>Sudoku game, generating Sudoku boards, Sudoku library</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
 
 </Project>

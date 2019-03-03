@@ -1,5 +1,5 @@
 ﻿// Sodoku library
-// Write by Trac Quang Hoa, 3/3/2019
+// Write by Trac Quang Hoa, 03/2019
 
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,8 @@ namespace SudokuLib
     {
         private const int EMPTY = 0;
 
+        private Random random = new Random();
+
         private int[][] boxes;
 
         private int[][] savedBoxes;
@@ -48,7 +50,7 @@ namespace SudokuLib
         /// <param name="x">Width of a block</param>
         /// <param name="y">Height of a block</param>
         /// <param name="processor">
-        /// This will be executed when finding a solution.
+        /// This will be executed when a solution is found.
         /// If the function returns false then the generating process will be stopped
         /// </param>
         /// <param name="savedBoxes">previous state that wanted to start generating from</param>
@@ -57,7 +59,7 @@ namespace SudokuLib
             X = x;
             Y = y;
             Size = X * Y;
-            this.processor = processor;
+            this.processor = processor ?? (r => false);
             this.savedBoxes = savedBoxes ?? CreateArray(Size, Size, 1);
 
             // Initialize boxes
@@ -70,6 +72,65 @@ namespace SudokuLib
                 // Store all candidates of each box
                 allCandidates.Add(j + 1);
             }
+        }
+
+        /// <summary>
+        /// Create an array of boolean which indicates open boxes of the game board
+        /// </summary>
+        /// <param name="numberOfOpenBoxes">number of open boxes</param>
+        /// <returns>the mask</returns>
+        public bool[][] CreateRandomMask(int numberOfOpenBoxes)
+        {
+            bool[][] mask = CreateArray(Size, Size, false);
+
+            // Find numberOfOpenBoxes items to put true which means those boxes will be opened
+            for (int i = 0; i < numberOfOpenBoxes; i++)
+            {
+                // Try to get a random box that is not opened 3 times
+                int row, col;
+                int time = 3;
+                do
+                {
+                    row = random.Next(Size);
+                    col = random.Next(Size);
+                } while (mask[row][col] && --time >= 0);
+
+                // After trying 3 times if the random box is still opened then move to the next box
+                // If the box is the last box then move to the first box which has row of 0 and col of 0
+                while (mask[row][col])
+                {
+                    if (IsLastBox(row, col))
+                    {
+                        row = col = 0;
+                    }
+                    else
+                    {
+                        (row, col) = GetNextBox(row, col);
+                    }
+                }
+
+                mask[row][col] = true;
+            }
+
+            return mask;
+        }
+
+        /// <summary>
+        /// Create a permutation of a list form 1 to Size
+        /// </summary>
+        /// <returns>the permutation</returns>
+        public int[] GetPermutation()
+        {
+            var values = Enumerable.Range(1, Size).ToList();
+            var permutation = new List<int>();
+            for (int i = 0; i < Size; i++)
+            {
+                int randIndex = random.Next(values.Count());
+                permutation.Add(values[randIndex]);
+                values.RemoveAt(randIndex);
+            }
+
+            return permutation.ToArray();
         }
 
         /// <summary>
@@ -259,9 +320,9 @@ namespace SudokuLib
         /// <param name="m">dimension 2</param>
         /// <param name="initValue">value to fill the array</param>
         /// <returns>an array</returns>
-        private static int[][] CreateArray(int n, int m, int initValue)
+        private static T[][] CreateArray<T>(int n, int m, T initValue)
         {
-            int[][] arr = new int[n][];
+            T[][] arr = new T[n][];
             for (int i = 0; i < n; i++)
             {
                 arr[i] = Enumerable.Repeat(initValue, m).ToArray();
@@ -269,5 +330,7 @@ namespace SudokuLib
 
             return arr;
         }
+
+
     }
 }

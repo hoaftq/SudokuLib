@@ -91,8 +91,33 @@ namespace SudokuLibTest
             }
         }
 
+        [TestMethod]
+        public void CreateRandomMaskTest1()
+        {
+            int x = 3, y = 3,
+                numberOfOpenBoxes = 25;
+            var game = new SudokuGame(x, y, null);
+            var mask = game.CreateRandomMask(numberOfOpenBoxes);
+            int numberOfTrue = mask.Sum(r => r.Count(c => c));
+            Print(mask);
 
-        private static void Print(int[][] contents)
+            Assert.AreEqual(numberOfOpenBoxes, numberOfTrue);
+        }
+
+        [TestMethod]
+        public void GetPermutationTest1()
+        {
+            int x = 3, y = 3;
+            var game = new SudokuGame(x, y, null);
+            int[] values = game.GetPermutation();
+            for (int i = 1; i <= x * y; i++)
+            {
+                Assert.IsTrue(values.Contains(i), $"The permutation does not container {i}");
+            }
+        }
+
+
+        private static void Print<T>(T[][] contents)
         {
             for (int i = 0; i < contents.Length; i++)
             {
