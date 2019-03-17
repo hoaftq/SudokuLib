@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SudokuLib
+namespace SudokuLib.Generator
 {
     public delegate bool GameOutputDelegate(int[][] contents);
 
@@ -21,22 +21,20 @@ namespace SudokuLib
     ///  |    Y   x x x   x x x
     ///  |    |   x x x   x x x
     /// </summary>
-    public class SudokuGenerator
+    public class GeneratorBase
     {
-        private const int EMPTY = 0;
-
-        private Random random = new Random();
-
-        private int[][] boxes;
-
-        private int[][] savedBoxes;
+        public const int EMPTY = 0;
 
         private List<int> allCandidates = new List<int>();
 
-        private GameOutputDelegate processor;
+        private readonly GameOutputDelegate processor;
+
+        private readonly int[][] savedBoxes;
+
+        protected int[][] boxes;
 
         // true means there is a request to stop the generator
-        private bool isStopped;
+        protected bool isStopped;
 
         public int X { get; }
 
@@ -54,7 +52,7 @@ namespace SudokuLib
         /// If the function returns false then the generating process will be stopped
         /// </param>
         /// <param name="savedBoxes">previous state that wanted to start generating from</param>
-        public SudokuGenerator(int x, int y, GameOutputDelegate processor, int[][] savedBoxes = null)
+        public GeneratorBase(int x, int y, GameOutputDelegate processor, int[][] savedBoxes = null)
         {
             X = x;
             Y = y;
@@ -64,101 +62,37 @@ namespace SudokuLib
 
             // Initialize boxes
             boxes = CreateArray(Size, Size, EMPTY);
-            for (int j = 0; j < Size; j++)
-            {
-                // Fill the first row of boxes
-                boxes[0][j] = j + 1;
 
-                // Store all candidates of each box
-                allCandidates.Add(j + 1);
-            }
-        }
-
-        /// <summary>
-        /// Create an array of boolean which indicates open boxes of the game board
-        /// </summary>
-        /// <param name="numberOfOpenBoxes">number of open boxes</param>
-        /// <returns>the mask</returns>
-        public bool[][] CreateRandomMask(int numberOfOpenBoxes)
-        {
-            bool[][] mask = CreateArray(Size, Size, false);
-
-            // Find numberOfOpenBoxes items to put true which means those boxes will be opened
-            for (int i = 0; i < numberOfOpenBoxes; i++)
-            {
-                // Try to get a random box that is not opened 3 times
-                int row, col;
-                int time = 3;
-                do
-                {
-                    row = random.Next(Size);
-                    col = random.Next(Size);
-                } while (mask[row][col] && --time >= 0);
-
-                // After trying 3 times if the random box is still opened then move to the next box
-                // If the box is the last box then move to the first box which has row of 0 and col of 0
-                while (mask[row][col])
-                {
-                    if (IsLastBox(row, col))
-                    {
-                        row = col = 0;
-                    }
-                    else
-                    {
-                        (row, col) = GetNextBox(row, col);
-                    }
-                }
-
-                mask[row][col] = true;
-            }
-
-            return mask;
-        }
-
-        /// <summary>
-        /// Create a permutation of a list form 1 to Size
-        /// </summary>
-        /// <returns>the permutation</returns>
-        public int[] GetPermutation()
-        {
-            var values = Enumerable.Range(1, Size).ToList();
-            var permutation = new List<int>();
             for (int i = 0; i < Size; i++)
             {
-                int randIndex = random.Next(values.Count());
-                permutation.Add(values[randIndex]);
-                values.RemoveAt(randIndex);
+                // Store all candidates of each box
+                allCandidates.Add(i + 1);
             }
-
-            return permutation.ToArray();
         }
 
         /// <summary>
-        /// Generate game boards
+        /// Solve the game from the box (<paramref name="continueFromLastStop"/>, <paramref name="col"/>).
+        /// isStopped must be set to false before calling this function
         /// </summary>
+        /// <param name="row">vertical dimension to start resolving</param>
+        /// <param name="col">horizontal dimension to start resolving</param>
         /// <param name="continueFromLastStop">
         /// true: continue generating from the last stop
         /// false: generate from start
         /// </param>
-        public void Generate(bool continueFromLastStop = false)
-        {
-            isStopped = false;
-            Resolve(1, 0, continueFromLastStop);
-        }
-
-        /// <summary>
-        /// Try to solve the box (<paramref name="continueFromLastStop"/>, <paramref name="col"/>)
-        /// </summary>
-        /// <param name="row">vertical dimension</param>
-        /// <param name="col">horizontal dimension</param>
-        /// <param name="continueFromLastStop">
-        /// true: continue generating from the last stop
-        /// false: generate from start
-        /// </param>
-        private void Resolve(int row, int col, bool continueFromLastStop)
+        public void Solve(int row, int col, bool continueFromLastStop)
         {
             if (isStopped)
             {
+                return;
+            }
+
+            // The box is a preset box
+            if (boxes[row][col] != EMPTY)
+            {
+                // Ignore the box, solve the next box
+                (int nextRow, int nextCol) = GetNextBox(row, col);
+                Solve(nextRow, nextCol, continueFromLastStop);
                 return;
             }
 
@@ -169,7 +103,7 @@ namespace SudokuLib
                 boxes[row][col] = val;
 
                 // If the current box is changed then the candidates of next boxes need to be recaculated
-                // So we need to reset save contents of those box
+                // So we need to reset save contents of those boxes
                 if (continueFromLastStop && boxes[row][col] != savedBoxes[row][col])
                 {
                     if (!IsLastBox(row, col))
@@ -192,9 +126,9 @@ namespace SudokuLib
                 }
                 else
                 {
-                    // Resolve the next box
+                    // Solve the next box
                     (int nextRow, int nextCol) = GetNextBox(row, col);
-                    Resolve(nextRow, nextCol, continueFromLastStop);
+                    Solve(nextRow, nextCol, continueFromLastStop);
                 }
             }
 
@@ -202,6 +136,55 @@ namespace SudokuLib
             boxes[row][col] = EMPTY;
         }
 
+        /// <summary>
+        /// Get the next box of the box given by <paramref name="row"/> and <paramref name="col"/>
+        /// from top to bottom and left to right
+        /// </summary>
+        /// <param name="row">vertical dimension</param>
+        /// <param name="col">horizontal dimension</param>
+        /// <returns>dimension of the next box</returns>
+        protected (int Row, int Col) GetNextBox(int row, int col)
+        {
+            if (col == Size - 1)
+            {
+                return (row + 1, 0);
+            }
+
+            return (row, col + 1);
+        }
+
+        /// <summary>
+        /// Check if the box given by <paramref name="row"/> and <paramref name="col"/> is the last box in the game board
+        /// </summary>
+        /// <param name="row">vertical dimension</param>
+        /// <param name="col">horizontal dimension</param>
+        /// <returns>true: the box is the last box, false: otherwise</returns>
+        protected bool IsLastBox(int row, int col) => row == Size - 1 && col == Size - 1;
+
+        /// <summary>
+        /// Save the last state of game board. The saved information will be used to resume the generator
+        /// </summary>
+        private void SaveCurrentBoxes()
+        {
+            // Copy all values from boxes to savedBoxes
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                Array.Copy(boxes[i], savedBoxes[i], boxes[i].Length);
+            }
+
+            // Make the saved boxes go to next state, so that the last result won't be outputted duplicately
+            for (int i = Size - 1; i >= 0; i--)
+            {
+                for (int j = Size - 1; j >= 0; j--)
+                {
+                    if (savedBoxes[i][j] < Size - 1)
+                    {
+                        savedBoxes[i][j]++;
+                        return;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Reset saved boxes of the next box of box (<paramref name="row"/>, <paramref name="col"/>)
@@ -264,63 +247,13 @@ namespace SudokuLib
         }
 
         /// <summary>
-        /// Get the next box of the box given by <paramref name="row"/> and <paramref name="col"/>
-        /// from top to bottom and left to right
-        /// </summary>
-        /// <param name="row">vertical dimension</param>
-        /// <param name="col">horizontal dimension</param>
-        /// <returns>dimension of the next box</returns>
-        private (int Row, int Col) GetNextBox(int row, int col)
-        {
-            if (col == Size - 1)
-            {
-                return (row + 1, 0);
-            }
-
-            return (row, col + 1);
-        }
-
-        /// <summary>
-        /// Check if the box given by <paramref name="row"/> and <paramref name="col"/> is the last box in the game board
-        /// </summary>
-        /// <param name="row">vertical dimension</param>
-        /// <param name="col">horizontal dimension</param>
-        /// <returns>true: the box is the last box, false: otherwise</returns>
-        private bool IsLastBox(int row, int col) => row == Size - 1 && col == Size - 1;
-
-        /// <summary>
-        /// Save the last state of game board. The saved information will be used to resume the generator
-        /// </summary>
-        private void SaveCurrentBoxes()
-        {
-            // Copy all values from boxes to savedBoxes
-            for (int i = 0; i < boxes.Length; i++)
-            {
-                Array.Copy(boxes[i], savedBoxes[i], boxes[i].Length);
-            }
-
-            // Make the saved boxes go to next state, so that the last result won't be outputted duplicately
-            for (int i = Size - 1; i >= 0; i--)
-            {
-                for (int j = Size - 1; j >= 0; j--)
-                {
-                    if (savedBoxes[i][j] < Size - 1)
-                    {
-                        savedBoxes[i][j]++;
-                        return;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Create a 2-dimension array and initilize with the value of <paramref name="initValue"/>
         /// </summary>
         /// <param name="n">dimension 1</param>
         /// <param name="m">dimension 2</param>
         /// <param name="initValue">value to fill the array</param>
         /// <returns>an array</returns>
-        private static T[][] CreateArray<T>(int n, int m, T initValue)
+        protected static T[][] CreateArray<T>(int n, int m, T initValue)
         {
             T[][] arr = new T[n][];
             for (int i = 0; i < n; i++)
@@ -330,7 +263,5 @@ namespace SudokuLib
 
             return arr;
         }
-
-
     }
 }

@@ -1,6 +1,9 @@
-﻿using System;
+﻿// Sodoku library
+// Write by Trac Quang Hoa, 03/2019
 
-namespace SodokuLib.Game
+using System;
+
+namespace SudokuLib.Game
 {
     public class GameBox
     {
