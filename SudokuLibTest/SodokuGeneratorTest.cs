@@ -7,13 +7,13 @@ using System.Linq;
 namespace SudokuLibTest
 {
     [TestClass]
-    public class SodokuGameTest
+    public class SodokuGeneratorTest
     {
         [TestMethod]
         public void SudokuGameTest1()
         {
             int X = 3, Y = 2;
-            var game = new SudokuGame(X, Y, Processor);
+            var game = new SudokuGenerator(X, Y, Processor);
             game.Generate();
 
             bool Processor(int[][] contents)
@@ -31,7 +31,7 @@ namespace SudokuLibTest
         {
             int X = 3, Y = 3;
             int numberOfResult = 0;
-            var game = new SudokuGame(X, Y, Processor);
+            var game = new SudokuGenerator(X, Y, Processor);
             game.Generate();
 
             bool Processor(int[][] contents)
@@ -54,7 +54,7 @@ namespace SudokuLibTest
             int X = 3, Y = 3;
             int time = 1;
 
-            var game = new SudokuGame(X, Y, Processor);
+            var game = new SudokuGenerator(X, Y, Processor);
 
             game.Generate();
 
@@ -96,7 +96,7 @@ namespace SudokuLibTest
         {
             int x = 3, y = 3,
                 numberOfOpenBoxes = 25;
-            var game = new SudokuGame(x, y, null);
+            var game = new SudokuGenerator(x, y, null);
             var mask = game.CreateRandomMask(numberOfOpenBoxes);
             int numberOfTrue = mask.Sum(r => r.Count(c => c));
             Print(mask);
@@ -108,7 +108,7 @@ namespace SudokuLibTest
         public void GetPermutationTest1()
         {
             int x = 3, y = 3;
-            var game = new SudokuGame(x, y, null);
+            var game = new SudokuGenerator(x, y, null);
             int[] values = game.GetPermutation();
             for (int i = 1; i <= x * y; i++)
             {

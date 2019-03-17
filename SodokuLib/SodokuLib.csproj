@@ -5,11 +5,13 @@
     <Authors>hoaftq</Authors>
     <Product>SodokuLib</Product>
     <Company />
-    <PackageId>SodokuLib_hoaftq</PackageId>
-    <PackageTags>Sudoku game, generating Sudoku boards, Sudoku library</PackageTags>
+    <PackageId>SodokuLib</PackageId>
+    <PackageTags>Sudoku game, generating Sudoku boards, Sudoku library, Sudoku .NET library</PackageTags>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Primitives" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 

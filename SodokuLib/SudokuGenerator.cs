@@ -12,7 +12,7 @@ namespace SudokuLib
     /// <summary>
     ///           -----col-----
     ///           --X--   --X--
-    ///  |    Y   1 2 3   4 5 6   <- the first row is aways initialized with the values from 1 to Size
+    ///  |    Y   1 2 3   4 5 6   <- the first row is always initialized with the values from 1 to Size
     ///  |    |   x x x   x x x
     ///  |        
     ///  row  Y   x x x   x x x
@@ -21,7 +21,7 @@ namespace SudokuLib
     ///  |    Y   x x x   x x x
     ///  |    |   x x x   x x x
     /// </summary>
-    public class SudokuGame
+    public class SudokuGenerator
     {
         private const int EMPTY = 0;
 
@@ -54,7 +54,7 @@ namespace SudokuLib
         /// If the function returns false then the generating process will be stopped
         /// </param>
         /// <param name="savedBoxes">previous state that wanted to start generating from</param>
-        public SudokuGame(int x, int y, GameOutputDelegate processor, int[][] savedBoxes = null)
+        public SudokuGenerator(int x, int y, GameOutputDelegate processor, int[][] savedBoxes = null)
         {
             X = x;
             Y = y;
@@ -220,7 +220,7 @@ namespace SudokuLib
         /// <param name="row">vertical dimension</param>
         /// <param name="col">horizontal dimension</param>
         /// <returns>values can be put to box (<paramref name="row"/>, <paramref name="col"/>)</returns>
-        private IEnumerable<int> GetCandidates(int row, int col)
+        private List<int> GetCandidates(int row, int col)
         {
             return allCandidates
                 .Except(GetColumn(col))
