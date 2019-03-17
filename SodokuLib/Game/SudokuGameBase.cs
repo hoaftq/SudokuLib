@@ -18,28 +18,28 @@ namespace SudokuLib.Game
 
         private const double VERY_HARD_OPEN_BOXES_RATE = 4.4;
 
-        //private SudokuGenerator generator;
-
         public int X { get; }
 
         public int Y { get; }
 
         public int Size => X * Y;
 
-        public List<GameBox> Boxes { get; } = new List<GameBox>();
+        // We don't want this list to be added or removed from outside
+        // However they can still add or remove items from this list by casting this to a List
+        // We can use List.AsReadonly from .NET Standard 1.3
+        public IReadOnlyList<GameBox> Boxes { get; } = new List<GameBox>();
 
         public GameLevel Level { get; private set; }
 
 
         public SudokuGameBase(int x, int y, GameLevel level = GameLevel.Medium)
         {
-            //generator = new SudokuGenerator(x, y, ResultHandler);
             X = x;
             Y = y;
             Level = level;
             for (int i = 0; i < Size * Size; i++)
             {
-                Boxes.Add(new GameBox());
+                ((List<GameBox>)Boxes).Add(new GameBox());
             }
         }
 
@@ -81,12 +81,10 @@ namespace SudokuLib.Game
         }
 
         public abstract void NewGame();
-        //=> generator.Generate(true);
 
         public void NewGame(GameLevel level)
         {
             Level = level;
-            //generator.Generate(true);
             NewGame();
         }
 
@@ -114,28 +112,6 @@ namespace SudokuLib.Game
                 }
             }
         }
-
-        //private bool ResultHandler(int[][] result)
-        //{
-        //    var mask = generator.CreateRandomMask(GetNumberOfOpenBoxes(Level));
-        //    var permutation = generator.GetPermutation();
-
-        //    for (int i = 0; i < Size; i++)
-        //    {
-        //        for (int j = 0; j < Size; j++)
-        //        {
-        //            int value = permutation[result[i][j] - 1];
-        //            Boxes.Add(new GameBox()
-        //            {
-        //                Value = value,
-        //                IsFixed = mask[i][j],
-        //                DisplayValue = mask[i][j] ? (int?)value : null
-        //            });
-        //        }
-        //    }
-
-        //    return false;
-        //}
 
         protected int GetNumberOfOpenBoxes(GameLevel level)
         {

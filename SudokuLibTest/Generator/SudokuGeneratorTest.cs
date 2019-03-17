@@ -6,7 +6,7 @@ using System.Linq;
 namespace SudokuLibTest.Generator
 {
     [TestClass]
-    public class SodokuGeneratorTest
+    public class SudokuGeneratorTest
     {
         [TestMethod]
         public void SudokuGameTest1()

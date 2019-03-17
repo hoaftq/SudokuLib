@@ -16,6 +16,12 @@ namespace SudokuLib.Generator
             }
         }
 
+        public bool Validate()
+        {
+            // TODO not implement yet
+            return false;
+        }
+
         public void Solve(bool continueFromLastStop = false)
         {
             isStopped = false;
