@@ -51,21 +51,21 @@ namespace SudokuLib.Generator
 
             List<(int x, int y, int value)> GetBoxes(int rowFrom, int rowTo, int colFrom, int colTo)
             {
-                var boxes = new List<(int, int, int)>();
+                var range = new List<(int, int, int)>();
                 for (int i = rowFrom; i <= rowTo; i++)
                 {
                     for (int j = colFrom; j <= colTo; j++)
                     {
-                        boxes.Add((i, j, presetBoard[i][j]));
+                        range.Add((i, j, boxes[i][j]));
                     }
                 }
 
-                return boxes;
+                return range;
             }
 
-            void Validate(List<(int x, int y, int value)> boxes)
+            void Validate(List<(int x, int y, int value)> range)
             {
-                var t = boxes.OrderBy(r => r.value).ToList();
+                var t = range.OrderBy(r => r.value).ToList();
                 for (int i = 0; i < t.Count - 1; i++)
                 {
                     if (t[i].value == t[i + 1].value)
@@ -76,9 +76,9 @@ namespace SudokuLib.Generator
                 }
             }
 
-            void ValidateSingleValue(List<(int x, int y, int value)> boxes)
+            void ValidateSingleValue(List<(int x, int y, int value)> range)
             {
-                foreach (var box in boxes.Where(r => r.value < 1 || r.value > Size))
+                foreach (var box in range.Where(r => r.value < 1 || r.value > Size))
                 {
                     errors[box.x][box.y] = true;
                 }

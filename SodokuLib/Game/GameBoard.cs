@@ -8,16 +8,8 @@ using System.Linq;
 
 namespace SudokuLib.Game
 {
-    public abstract class SudokuGameBase
+    public class GameBoard
     {
-        private const double EASY_OPEN_BOXES_RATE = 2.6;
-
-        private const double MEDIUM_OPEN_BOXES_RATE = 3.2;
-
-        private const double HARD_OPEND_BOXES_RATE = 3.8;
-
-        private const double VERY_HARD_OPEN_BOXES_RATE = 4.4;
-
         public int X { get; }
 
         public int Y { get; }
@@ -29,14 +21,10 @@ namespace SudokuLib.Game
         // We can use List.AsReadonly from .NET Standard 1.3
         public IReadOnlyList<GameBox> Boxes { get; } = new List<GameBox>();
 
-        public GameLevel Level { get; private set; }
-
-
-        public SudokuGameBase(int x, int y, GameLevel level = GameLevel.Medium)
+        public GameBoard(int x, int y)
         {
             X = x;
             Y = y;
-            Level = level;
             for (int i = 0; i < Size * Size; i++)
             {
                 ((List<GameBox>)Boxes).Add(new GameBox());
@@ -80,22 +68,14 @@ namespace SudokuLib.Game
             });
         }
 
-        public abstract void NewGame();
-
-        public void NewGame(GameLevel level)
-        {
-            Level = level;
-            NewGame();
-        }
-
-        public void ValidateWhenChangeAt(int row, int col)
-        {
-            ValidateDimensionParam(row, nameof(row));
-            ValidateDimensionParam(col, nameof(col));
+        protected void ValidateRow(int row) =>
             ValidateBoxes(Row(row), (box) => box.IsInvalidRow = true);
-            ValidateBoxes(Column(row), (box) => box.IsInvalidCol = true);
+
+        protected void ValidateColumn(int col) =>
+            ValidateBoxes(Column(col), (box) => box.IsInvalidCol = true);
+
+        protected void ValidateBlockContains(int row, int col) =>
             ValidateBoxes(Block(row, col), (box) => box.IsInvalidBlock = true);
-        }
 
         private void ValidateBoxes(IEnumerable<GameBox> boxes, Action<GameBox> invalidAction)
         {
@@ -113,28 +93,8 @@ namespace SudokuLib.Game
             }
         }
 
-        protected int GetNumberOfOpenBoxes(GameLevel level)
-        {
-            switch (level)
-            {
-                case GameLevel.Easy:
-                    return (int)Math.Round(Size * Size / EASY_OPEN_BOXES_RATE);
-
-                case GameLevel.Medium:
-                    return (int)Math.Round(Size * Size / MEDIUM_OPEN_BOXES_RATE);
-
-                case GameLevel.Hard:
-                    return (int)Math.Round(Size * Size / HARD_OPEND_BOXES_RATE);
-
-                case GameLevel.VeryHard:
-                    return (int)Math.Round(Size * Size / VERY_HARD_OPEN_BOXES_RATE);
-            }
-
-            throw new ArgumentException();
-        }
-
         [Conditional("DEBUG")]
-        private void ValidateDimensionParam(int value, string name)
+        protected void ValidateDimensionParam(int value, string name)
         {
             if (value < 0 || value >= Size)
             {
