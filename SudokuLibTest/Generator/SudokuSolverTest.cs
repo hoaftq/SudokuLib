@@ -24,7 +24,8 @@ namespace SudokuLibTest.Generator
                 new int[]{0, 7, 8,   4, 0, 0,   5, 0, 0},
                 new int[]{0, 0, 6,   3, 0, 5,   0, 0, 0}
             };
-            var solver = new SudokuSolver(X, Y, Processor, presetBoard);
+            var solver = new SudokuSolver(X, Y, Processor);
+            solver.InitializeBoard(presetBoard);
             solver.Solve();
 
             bool Processor(int[][] contents)
@@ -56,7 +57,8 @@ namespace SudokuLibTest.Generator
                 new int[]{0, 7, 8,   4, 0, 0,   5, 0, 0},
                 new int[]{0, 0, 0,   0, 0, 0,   0, 0, 0}
             };
-            var solver = new SudokuSolver(X, Y, Processor, presetBoard);
+            var solver = new SudokuSolver(X, Y, Processor);
+            solver.InitializeBoard(presetBoard);
             solver.Solve();
 
             // Expected getting more than just 1 result
