@@ -14,15 +14,10 @@ namespace SudokuLib.Generator
         {
         }
 
+        // TODO haven't checked sizes yet
         public bool[][] InitializeBoard(int[][] presetBoard)
         {
-            // Validate before setting
             var errors = CreateArray(Size, Size, false);
-
-            for (int i = 0; i < Size; i++)
-            {
-                Array.Copy(presetBoard[i], boxes[i], Size);
-            }
 
             for (int i = 0; i < Size; i++)
             {
@@ -46,8 +41,15 @@ namespace SudokuLib.Generator
                 }
             }
 
-            return errors;
+            if (errors.All(row => row.All(item => !item)))
+            {
+                for (int i = 0; i < Size; i++)
+                {
+                    Array.Copy(presetBoard[i], boxes[i], Size);
+                }
+            }
 
+            return errors;
 
             List<(int x, int y, int value)> GetBoxes(int rowFrom, int rowTo, int colFrom, int colTo)
             {
@@ -56,7 +58,7 @@ namespace SudokuLib.Generator
                 {
                     for (int j = colFrom; j <= colTo; j++)
                     {
-                        range.Add((i, j, boxes[i][j]));
+                        range.Add((i, j, presetBoard[i][j]));
                     }
                 }
 
