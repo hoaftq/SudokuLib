@@ -67,7 +67,7 @@ namespace SudokuLib.Generator
 
             void Validate(List<(int x, int y, int value)> range)
             {
-                var t = range.OrderBy(r => r.value).ToList();
+                var t = range.Where(r => r.value != EMPTY).OrderBy(r => r.value).ToList();
                 for (int i = 0; i < t.Count - 1; i++)
                 {
                     if (t[i].value == t[i + 1].value)
@@ -80,7 +80,7 @@ namespace SudokuLib.Generator
 
             void ValidateSingleValue(List<(int x, int y, int value)> range)
             {
-                foreach (var box in range.Where(r => r.value < 1 || r.value > Size))
+                foreach (var box in range.Where(r => r.value < 0 || r.value > Size))
                 {
                     errors[box.x][box.y] = true;
                 }
