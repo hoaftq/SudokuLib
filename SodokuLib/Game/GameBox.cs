@@ -14,10 +14,11 @@ namespace SudokuLib.Game
             get => displayValue;
             set
             {
-                if (IsFixed)
-                {
-                    throw new InvalidOperationException("Can not change DisplayValue when the box is fixed");
-                }
+                // TODO
+                //if (IsFixed)
+                //{
+                //    throw new InvalidOperationException("Can not change DisplayValue when the box is fixed");
+                //}
 
                 displayValue = value;
                 if (displayValue == null)

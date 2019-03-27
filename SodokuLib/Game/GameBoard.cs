@@ -43,7 +43,7 @@ namespace SudokuLib.Game
         public IEnumerable<GameBox> Row(int row)
         {
             ValidateDimensionParam(row, nameof(row));
-            return Boxes.Where((r, index) => index / Size == 0);
+            return Boxes.Where((r, index) => index / Size == row);
         }
 
         public IEnumerable<GameBox> Column(int col)
@@ -69,26 +69,38 @@ namespace SudokuLib.Game
         }
 
         protected void ValidateRow(int row) =>
-            ValidateBoxes(Row(row), (box) => box.IsInvalidRow = true);
+            ValidateBoxes(Row(row), (box) => box.IsInvalidRow = false, (box) => box.IsInvalidRow = true);
 
         protected void ValidateColumn(int col) =>
-            ValidateBoxes(Column(col), (box) => box.IsInvalidCol = true);
+            ValidateBoxes(Column(col), (box) => box.IsInvalidCol = false, (box) => box.IsInvalidCol = true);
 
         protected void ValidateBlockContains(int row, int col) =>
-            ValidateBoxes(Block(row, col), (box) => box.IsInvalidBlock = true);
+            ValidateBoxes(Block(row, col), (box) => box.IsInvalidBlock = false, (box) => box.IsInvalidBlock = true);
 
-        private void ValidateBoxes(IEnumerable<GameBox> boxes, Action<GameBox> invalidAction)
+        private void ValidateBoxes(IEnumerable<GameBox> boxes, Action<GameBox> validAction, Action<GameBox> invalidAction)
         {
-            var changedBoxes = boxes
+            foreach (var box in boxes)
+            {
+                validAction(box);
+            }
+
+            var dirtyBoxes = boxes
                .Where(r => r.DisplayValue != null)
                .OrderBy(r => r.DisplayValue)
                .ToList();
-            for (int i = 0; i < changedBoxes.Count - 1; i++)
+            for (int i = 0; i < dirtyBoxes.Count - 1; i++)
             {
-                if (changedBoxes[i].DisplayValue == changedBoxes[i + 1].DisplayValue)
+                if (dirtyBoxes[i].DisplayValue == dirtyBoxes[i + 1].DisplayValue)
                 {
-                    invalidAction(changedBoxes[i]);
-                    invalidAction(changedBoxes[i + 1]);
+                    if (!dirtyBoxes[i].IsFixed)
+                    {
+                        invalidAction(dirtyBoxes[i]);
+                    }
+
+                    if (!dirtyBoxes[i + 1].IsFixed)
+                    {
+                        invalidAction(dirtyBoxes[i + 1]);
+                    }
                 }
             }
         }

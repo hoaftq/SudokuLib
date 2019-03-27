@@ -1,0 +1,141 @@
+﻿<Page
+    x:Class="SudokuUWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SudokuUWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:SudokuUWP.Controls"
+    xmlns:models="using:SudokuUWP.Models"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    DataContext="{x:Bind ViewModel, Mode=OneWay}"
+    SizeChanged="Page_SizeChanged"
+    KeyDown="Page_KeyDown">
+
+    <Page.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="80"/>
+        </Style>
+    </Page.Resources>
+    <RelativePanel>
+        <GridView Name="gameBoard"
+                  ItemsSource="{x:Bind ViewModel.Boxes, Mode=OneWay}"
+                  RelativePanel.AlignHorizontalCenterWithPanel="True"
+                  RelativePanel.AlignVerticalCenterWithPanel="True"
+                  Padding="0" ><!--Width="540"-->
+
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="models:BoxModel">
+                    <controls:Box Value="{x:Bind Mode=TwoWay}" Tapped="Box_Tapped">
+                        <FlyoutBase.AttachedFlyout>
+                            <Flyout x:Name="numbersBoard">
+                                <Flyout.FlyoutPresenterStyle>
+                                    <Style TargetType="FlyoutPresenter">
+                                        <Setter Property="Opacity" Value="0.85"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Background" Value="LightGray"/>
+                                    </Style>
+                                </Flyout.FlyoutPresenterStyle>
+                                <controls:NumbersBoard X="{x:Bind X, Mode=OneWay}"
+                                                       Y="{x:Bind Y, Mode=OneWay}"
+                                                       SelectedNumber="{x:Bind DisplayValue, Mode=TwoWay}"
+                                                       BoxWidth="60"
+                                                       BoxHeight="60"
+                                                       FontSize="40"
+                                                       Selected="NumbersBoard_Selected"
+                                                       SelectedParameter="{Binding ElementName=numbersBoard}">
+                                </controls:NumbersBoard>
+                            </Flyout>
+                        </FlyoutBase.AttachedFlyout>
+                    </controls:Box>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+            <GridView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsWrapGrid MaximumRowsOrColumns="{Binding Size, Mode=OneWay}"
+                                   ItemHeight="60"
+                                   ItemWidth="60"
+                                   Orientation="Horizontal"
+                                   Loaded="ItemsWrapGrid_Loaded"
+                                   Margin="0">
+                    </ItemsWrapGrid>
+                </ItemsPanelTemplate>
+            </GridView.ItemsPanel>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="MinHeight" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                </Style>
+            </GridView.ItemContainerStyle>
+        </GridView>
+
+        <StackPanel Name="supportArea"
+                    RelativePanel.RightOf="gameBoard"
+                    Margin="10,0,0,0">
+            <Button Content="Hint"
+                    Margin="0,0,0,5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+            <Button Content="Clear"
+                    Margin="0,0,0,5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+            <Button Content="Undo"
+                    Margin="0,0,0,5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"/>
+        </StackPanel>
+
+        <RelativePanel Name="controlArea"
+                       RelativePanel.LeftOf="gameBoard"
+                       RelativePanel.AlignTopWithPanel="True"
+                       RelativePanel.AlignBottomWithPanel="True"
+                       Margin="0,0,10,0">
+            <Button RelativePanel.AlignTopWithPanel="True"
+                    RelativePanel.AlignLeftWithPanel="True">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="12:12"/>
+                        <SymbolIcon Symbol="Pause"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="newBtn"
+                    RelativePanel.Above="newGameBtn"
+                    Margin="0,0,0,5"
+                    Command="{x:Bind ViewModel.NewGameCommand}">
+                <Button.Content>
+                    <StackPanel>
+                        <SymbolIcon Symbol="Refresh"/>
+                        <TextBlock Text="New"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="newGameBtn"
+                    RelativePanel.Above="solveGameBtn"
+                    Margin="0,0,0,5"
+                    Command="{x:Bind ViewModel.NewGameWithOptionsCommand}">
+                <Button.Content>
+                    <StackPanel>
+                        <SymbolIcon Symbol="Add"/>
+                        <TextBlock Text="New game"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="solveGameBtn"
+                    RelativePanel.AlignBottomWithPanel="True">
+                <Button.Content>
+                    <StackPanel>
+                        <SymbolIcon Symbol="ViewAll"/>
+                        <TextBlock Text="Solve game"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </RelativePanel>
+    </RelativePanel>
+</Page>

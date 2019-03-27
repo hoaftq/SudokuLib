@@ -56,8 +56,8 @@ namespace SudokuLib.Game
                     int value = permutation[result[i][j] - 1];
                     var box = Box(i, j);
                     box.Value = value;
-                    box.IsFixed = mask[i][j];
                     box.DisplayValue = mask[i][j] ? (int?)value : null;
+                    box.IsFixed = mask[i][j];
                 }
             }
 

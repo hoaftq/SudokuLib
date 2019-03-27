@@ -69,16 +69,7 @@ namespace SudokuLibTest
         /// <returns></returns>
         private static bool IsValidRange(IEnumerable<int> range)
         {
-            var values = range.OrderBy(r => r).ToList();
-            for (int i = 0; i < values.Count; i++)
-            {
-                if (values[i] != i + 1)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return Enumerable.Range(1, range.Count()).SequenceEqual(range.OrderBy(r => r));
         }
     }
 }
