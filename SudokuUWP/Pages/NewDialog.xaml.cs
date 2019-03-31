@@ -2,9 +2,8 @@
 // Write by Trac Quang Hoa, 03/2019
 
 using SudokuLib.Game;
-using System;
+using SudokuUWP.Models;
 using System.Collections.Generic;
-using System.Linq;
 using Windows.UI.Xaml.Controls;
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -16,13 +15,13 @@ namespace SudokuUWP.Pages
     {
         private List<int> Sizes => new List<int>() { 2, 3, 4 };
 
-        private List<GameLevel> Levels = Enum.GetValues(typeof(GameLevel)).Cast<GameLevel>().ToList();
+        private List<DispGameLevel> Levels => DispGameLevel.Values;
 
         public int X { get; set; } = 3;
 
         public int Y { get; set; } = 3;
 
-        public GameLevel Level { get; set; } = GameLevel.Medium;
+        public DispGameLevel Level { get; set; } = GameLevel.Medium;
 
         public NewGameDialog()
         {

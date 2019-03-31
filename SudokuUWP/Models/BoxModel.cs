@@ -17,7 +17,7 @@ namespace SudokuUWP.Models
 
         public int? DisplayValue
         {
-            get => BoxValue.DisplayValue;
+            get => BoxValue?.DisplayValue;
             set
             {
                 BoxValue.DisplayValue = value;
@@ -25,9 +25,9 @@ namespace SudokuUWP.Models
             }
         }
 
-        public bool IsFixed => BoxValue.IsFixed;
+        public bool IsFixed => BoxValue?.IsFixed ?? false;
 
-        public bool IsInvalid => BoxValue.IsInvalid;
+        public bool IsInvalid => BoxValue?.IsInvalid ?? false;
 
         private double width = double.NaN;
 
@@ -57,7 +57,7 @@ namespace SudokuUWP.Models
 
         public Brush FixedForeground { get; set; } = new SolidColorBrush(Colors.Black);
 
-        public Brush Foreground => BoxValue.IsFixed ? FixedForeground : NormalForeground;
+        public Brush Foreground => (BoxValue?.IsFixed ?? false) ? FixedForeground : NormalForeground;
 
 
         public Thickness BorderThickness { get; set; } = new Thickness(1);

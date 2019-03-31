@@ -64,7 +64,7 @@ namespace SudokuLib.Game
             {
                 int _row = index / Size;
                 int _col = index % Size;
-                return startRow <= _row && _row < endRow && startCol <= _col && _col <= endCol;
+                return startRow <= _row && _row < endRow && startCol <= _col && _col < endCol;
             });
         }
 

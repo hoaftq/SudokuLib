@@ -13,11 +13,20 @@
 
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-            <ComboBox ItemsSource="{x:Bind Sizes}" SelectedItem="{x:Bind X, Mode=TwoWay}" Header="X" Margin="0,0,15,0">
+            <ComboBox ItemsSource="{x:Bind Sizes}"
+                      SelectedItem="{x:Bind X, Mode=TwoWay}"
+                      Header="X"
+                      Margin="0,0,15,0">
             </ComboBox>
-            <ComboBox ItemsSource="{x:Bind Sizes}" SelectedItem="{x:Bind Y, Mode=TwoWay}" Header="Y">
+            <ComboBox ItemsSource="{x:Bind Sizes}"
+                      SelectedItem="{x:Bind Y, Mode=TwoWay}"
+                      Header="Y">
             </ComboBox>
         </StackPanel>
-        <ComboBox ItemsSource="{x:Bind Levels}" SelectedItem="{x:Bind Level, Mode=TwoWay}" Header="Level"></ComboBox>
+        <ComboBox ItemsSource="{x:Bind Levels, Mode=OneWay}"
+                  DisplayMemberPath="Text"
+                  SelectedItem="{x:Bind Level, Mode=TwoWay}"
+                  Header="Level">
+        </ComboBox>
     </StackPanel>
 </ContentDialog>

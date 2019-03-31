@@ -37,10 +37,10 @@ namespace SudokuUWP.Logics
         public GameLogic(int x, int y, GameLevel level)
         {
             game = new SudokuGame(x, y, level);
-            game.NewGame();
+            //game.NewGame();
 
             CreateGameBoard();
-            ApplyNewGame();
+            //ApplyNewGame();
         }
 
         public void NewGame(GameLevel? level = null)
