@@ -16,9 +16,10 @@ namespace SudokuUWP.Logics
 
         private const int BLOCK_THICKNESS = 2;
 
-        private readonly Brush DarkBlockBrush = new SolidColorBrush(Colors.LightGray);
+        private readonly Brush DarkBlockBrush = new SolidColorBrush(Color.FromArgb(255, 230, 230, 230));
 
         private readonly Brush LightBlockBrush = new SolidColorBrush(Colors.White);
+
 
         private SudokuGame game;
 
@@ -37,10 +38,7 @@ namespace SudokuUWP.Logics
         public GameLogic(int x, int y, GameLevel level)
         {
             game = new SudokuGame(x, y, level);
-            game.NewGame();
-
             CreateGameBoard();
-            ApplyNewGame();
         }
 
         public void NewGame(GameLevel? level = null)
@@ -57,11 +55,13 @@ namespace SudokuUWP.Logics
             ApplyNewGame();
         }
 
-        public void ValidateWhenChangeAt(BoxModel box)
+        public bool ValidateWhenChangeAt(BoxModel box)
         {
             int index = Boxes.IndexOf(box);
-            game.ValidateWhenChangeAt(index / Size, index % Size);
+            return game.ValidateWhenChangeAt(index / Size, index % Size);
         }
+
+        public bool IsEndGame() => game.IsEndGame();
 
         private void CreateGameBoard()
         {

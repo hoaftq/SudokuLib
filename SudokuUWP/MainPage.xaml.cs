@@ -22,6 +22,16 @@ namespace SudokuUWP
         public MainPage()
         {
             this.InitializeComponent();
+
+            foreach (var level in DispGameLevel.Values)
+            {
+                levelMenu.Items.Add(new MenuFlyoutItem()
+                {
+                    Text = level.Text,
+                    Command = ViewModel.LevelChangedCommand,
+                    CommandParameter = level
+                });
+            }
         }
 
         private void ItemsWrapGrid_Loaded(object sender, RoutedEventArgs e)

@@ -64,21 +64,27 @@ namespace SudokuLib.Game
             {
                 int _row = index / Size;
                 int _col = index % Size;
-                return startRow <= _row && _row < endRow && startCol <= _col && _col <= endCol;
+                return startRow <= _row && _row < endRow && startCol <= _col && _col < endCol;
             });
         }
 
-        protected void ValidateRow(int row) =>
+        public bool IsEndGame()
+        {
+            return Boxes.All(r => r.DisplayValue != null && !r.IsInvalid);
+        }
+
+        protected bool ValidateRow(int row) =>
             ValidateBoxes(Row(row), (box) => box.IsInvalidRow = false, (box) => box.IsInvalidRow = true);
 
-        protected void ValidateColumn(int col) =>
+        protected bool ValidateColumn(int col) =>
             ValidateBoxes(Column(col), (box) => box.IsInvalidCol = false, (box) => box.IsInvalidCol = true);
 
-        protected void ValidateBlockContains(int row, int col) =>
+        protected bool ValidateBlockContains(int row, int col) =>
             ValidateBoxes(Block(row, col), (box) => box.IsInvalidBlock = false, (box) => box.IsInvalidBlock = true);
 
-        private void ValidateBoxes(IEnumerable<GameBox> boxes, Action<GameBox> validAction, Action<GameBox> invalidAction)
+        private bool ValidateBoxes(IEnumerable<GameBox> boxes, Action<GameBox> validAction, Action<GameBox> invalidAction)
         {
+            bool isValid = true;
             foreach (var box in boxes)
             {
                 validAction(box);
@@ -100,9 +106,12 @@ namespace SudokuLib.Game
                     if (!dirtyBoxes[i + 1].IsFixed)
                     {
                         invalidAction(dirtyBoxes[i + 1]);
+                        isValid = false;
                     }
                 }
             }
+
+            return isValid;
         }
 
         [Conditional("DEBUG")]

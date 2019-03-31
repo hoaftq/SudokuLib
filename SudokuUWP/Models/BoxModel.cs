@@ -11,23 +11,36 @@ namespace SudokuUWP.Models
 {
     public class BoxModel : BindableObject
     {
-        public GameBox BoxValue { get; set; }
+        private GameBox boxValue;
 
-        public int Value => BoxValue.Value;
+        public GameBox BoxValue
+        {
+            get => boxValue;
+            set
+            {
+                boxValue = value;
+                NotifyBoxStateChanged();
+            }
+        }
+
+        public int Value => boxValue.Value;
 
         public int? DisplayValue
         {
-            get => BoxValue.DisplayValue;
+            get => boxValue?.DisplayValue;
             set
             {
-                BoxValue.DisplayValue = value;
+                boxValue.DisplayValue = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public bool IsFixed => BoxValue.IsFixed;
+        public bool IsFixed => boxValue?.IsFixed ?? false;
 
-        public bool IsInvalid => BoxValue.IsInvalid;
+        public bool IsInvalid => boxValue?.IsInvalid ?? false;
+
+        public bool IsEnabled => !boxValue.IsFixed;
+
 
         private double width = double.NaN;
 
@@ -45,7 +58,6 @@ namespace SudokuUWP.Models
             set => SetProperty(ref height, value);
         }
 
-
         public Brush NormalBackground { get; set; } = new SolidColorBrush(Colors.White);
 
         public Brush InvalidBackground { get; set; } = new SolidColorBrush(Colors.LightCoral);
@@ -57,12 +69,12 @@ namespace SudokuUWP.Models
 
         public Brush FixedForeground { get; set; } = new SolidColorBrush(Colors.Black);
 
-        public Brush Foreground => BoxValue.IsFixed ? FixedForeground : NormalForeground;
+        public Brush Foreground => (BoxValue?.IsFixed ?? false) ? FixedForeground : NormalForeground;
 
 
         public Thickness BorderThickness { get; set; } = new Thickness(1);
 
-        public Brush BorderBrush { get; set; } = new SolidColorBrush(Colors.LightGreen);
+        public Brush BorderBrush { get; set; } = new SolidColorBrush(Colors.LightBlue);
 
         public double FontSize { get; set; } = 40;
 
@@ -72,5 +84,25 @@ namespace SudokuUWP.Models
         public int X { get; set; }
 
         public int Y { get; set; }
+
+
+        public void NotifyBoxStateChanged()
+        {
+            NotifyPropertyChanged(nameof(Value));
+            NotifyPropertyChanged(nameof(DisplayValue));
+            NotifyPropertyChanged(nameof(IsFixed));
+            NotifyPropertyChanged(nameof(IsInvalid));
+            NotifyPropertyChanged(nameof(Background));
+            NotifyPropertyChanged(nameof(Foreground));
+            NotifyPropertyChanged(nameof(IsEnabled));
+        }
+
+        public void ClearInvalidState()
+        {
+            boxValue.IsInvalidRow = boxValue.IsInvalidCol = boxValue.IsInvalidBlock = false;
+            NotifyPropertyChanged(nameof(IsInvalid));
+            NotifyPropertyChanged(nameof(Background));
+            NotifyPropertyChanged(nameof(IsEnabled));
+        }
     }
 }

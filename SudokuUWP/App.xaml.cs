@@ -33,6 +33,19 @@ namespace SudokuUWP
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            this.EnteredBackground += App_EnteredBackground;
+            this.LeavingBackground += App_LeavingBackground;
+        }
+
+        private void App_LeavingBackground(object sender, LeavingBackgroundEventArgs e)
+        {
+        }
+
+        private void App_EnteredBackground(object sender, EnteredBackgroundEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+            var mainPage = rootFrame.Content as MainPage;
+            mainPage.ViewModel.PauseGame();
         }
 
         /// <summary>

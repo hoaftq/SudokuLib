@@ -17,6 +17,7 @@
         <Style TargetType="Button">
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="80"/>
+            <Setter Property="AllowFocusOnInteraction" Value="False"/>
         </Style>
     </Page.Resources>
     <RelativePanel>
@@ -24,8 +25,9 @@
                   ItemsSource="{x:Bind ViewModel.Boxes, Mode=OneWay}"
                   RelativePanel.AlignHorizontalCenterWithPanel="True"
                   RelativePanel.AlignVerticalCenterWithPanel="True"
-                  Padding="0" ><!--Width="540"-->
-
+                  Padding="0"
+                  SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                  IsHitTestVisible="{x:Bind ViewModel.IsPlaying, Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:BoxModel">
                     <controls:Box Value="{x:Bind Mode=TwoWay}" Tapped="Box_Tapped">
@@ -74,39 +76,75 @@
             </GridView.ItemContainerStyle>
         </GridView>
 
+        <Grid RelativePanel.AlignHorizontalCenterWithPanel="True"
+              RelativePanel.AlignVerticalCenterWithPanel="True"
+              Width="{Binding ActualWidth, ElementName=gameBoard}"
+              Height="{Binding ActualHeight, ElementName=gameBoard}"
+              Visibility="{x:Bind ViewModel.PlayingVisibility, Mode=OneWay}"
+              Background="LightGray">
+            <TextBlock Text="Paused"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="50"
+                       Foreground="White"/>
+        </Grid>
+
         <StackPanel Name="supportArea"
                     RelativePanel.RightOf="gameBoard"
+                    RelativePanel.AlignTopWith="gameBoard"
+                    RelativePanel.AlignBottomWith="gameBoard"
                     Margin="10,0,0,0">
-            <Button Content="Hint"
+            <Button Margin="0,0,0,5"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Command="{x:Bind ViewModel.HintCommand}"
+                    IsEnabled="{x:Bind ViewModel.IsHintEnabled, Mode=OneWay}">
+                <Button.Content>
+                    <StackPanel>
+                        <SymbolIcon Symbol="Emoji2"/>
+                        <TextBlock Text="Hint"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <!--<Button Content="Undo"
                     Margin="0,0,0,5"
                     HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"/>
-            <Button Content="Clear"
-                    Margin="0,0,0,5"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"/>
-            <Button Content="Undo"
-                    Margin="0,0,0,5"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"/>
+                    VerticalAlignment="Stretch"/>-->
+            <Button Name="solveGameBtn"
+                    Command="{x:Bind ViewModel.SolveGameCommand}"
+                    IsEnabled="{x:Bind ViewModel.IsPlaying, Mode=OneWay}">
+                <Button.Content>
+                    <StackPanel>
+                        <SymbolIcon Symbol="ViewAll"/>
+                        <TextBlock Text="Solve game"/>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
         </StackPanel>
 
         <RelativePanel Name="controlArea"
                        RelativePanel.LeftOf="gameBoard"
-                       RelativePanel.AlignTopWithPanel="True"
-                       RelativePanel.AlignBottomWithPanel="True"
+                       RelativePanel.AlignTopWith="gameBoard"
+                       RelativePanel.AlignBottomWith="gameBoard"
                        Margin="0,0,10,0">
             <Button RelativePanel.AlignTopWithPanel="True"
-                    RelativePanel.AlignLeftWithPanel="True">
+                    RelativePanel.AlignLeftWithPanel="True"
+                    FontSize="20"
+                    Command="{x:Bind ViewModel.PauseCommand}"
+                    IsEnabled="{x:Bind ViewModel.IsPauseOrPlaying, Mode=OneWay}">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="12:12"/>
-                        <SymbolIcon Symbol="Pause"/>
+                        <SymbolIcon Symbol="Pause"
+                                    Visibility="{x:Bind ViewModel.PauseVisibility, Mode=OneWay}"/>
+                        <SymbolIcon Symbol="Play"
+                                    Visibility="{x:Bind ViewModel.PlayingVisibility, Mode=OneWay}"/>
+                        <TextBlock Text="{x:Bind ViewModel.UsedTime, Mode=OneWay}"
+                                   Foreground="Blue"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
             <Button Name="newBtn"
-                    RelativePanel.Above="newGameBtn"
+                    RelativePanel.Above="levelBtn"
                     Margin="0,0,0,5"
                     Command="{x:Bind ViewModel.NewGameCommand}">
                 <Button.Content>
@@ -116,8 +154,16 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
+            <Button Name="levelBtn"
+                    RelativePanel.Above="newGameBtn"
+                    Margin="0,0,0,5"
+                    Content="{x:Bind ViewModel.Level, Mode=OneWay}">
+                <Button.Flyout>
+                    <MenuFlyout x:Name="levelMenu" Placement="Right"/>
+                </Button.Flyout>
+            </Button>
             <Button Name="newGameBtn"
-                    RelativePanel.Above="solveGameBtn"
+                    RelativePanel.AlignBottomWithPanel="True"
                     Margin="0,0,0,5"
                     Command="{x:Bind ViewModel.NewGameWithOptionsCommand}">
                 <Button.Content>
@@ -127,15 +173,19 @@
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Name="solveGameBtn"
-                    RelativePanel.AlignBottomWithPanel="True">
-                <Button.Content>
-                    <StackPanel>
-                        <SymbolIcon Symbol="ViewAll"/>
-                        <TextBlock Text="Solve game"/>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
         </RelativePanel>
+        
+        <StackPanel RelativePanel.AlignBottomWithPanel="True"
+                    RelativePanel.AlignRightWithPanel="True"
+                    Orientation="Horizontal"
+                    Margin="0,0,5,0">
+            <TextBlock Text="@hoaftq. This is an open source"
+                       Foreground="DarkGray"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+            <HyperlinkButton NavigateUri="https://github.com/hoaftq/SudokuLib"
+                             Content="project"
+                             VerticalAlignment="Bottom"/>
+        </StackPanel>
     </RelativePanel>
 </Page>

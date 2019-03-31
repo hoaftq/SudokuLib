@@ -8,7 +8,8 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     Width="{Binding Path=Value.Width, RelativeSource={RelativeSource Mode=Self}}"
-    Height="{Binding Path=Value.Height, RelativeSource={RelativeSource Mode=Self}}">
+    Height="{Binding Path=Value.Height, RelativeSource={RelativeSource Mode=Self}}"
+    IsEnabled="{Binding Path=Value.IsEnabled, RelativeSource={RelativeSource Mode=Self}}">
 
     <Grid BorderBrush="{x:Bind Value.BorderBrush, Mode=OneWay}"
           BorderThickness="{x:Bind Value.BorderThickness, Mode=OneWay}"

@@ -17,8 +17,6 @@ namespace SudokuUWP.Controls
             set
             {
                 SetValue(ValueProperty, value);
-
-                IsEnabled = !value.IsFixed;
             }
         }
 

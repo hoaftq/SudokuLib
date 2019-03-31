@@ -34,14 +34,12 @@ namespace SudokuLib.Game
             NewGame();
         }
 
-        public void ValidateWhenChangeAt(int row, int col)
+        public bool ValidateWhenChangeAt(int row, int col)
         {
             ValidateDimensionParam(row, nameof(row));
             ValidateDimensionParam(col, nameof(col));
 
-            ValidateRow(row);
-            ValidateColumn(col);
-            ValidateBlockContains(row, col);
+            return ValidateRow(row) && ValidateColumn(col) && ValidateBlockContains(row, col);
         }
 
         private bool ResultHandler(int[][] result)
