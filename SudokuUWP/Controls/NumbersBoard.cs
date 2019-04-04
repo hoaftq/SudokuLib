@@ -26,8 +26,13 @@ namespace SudokuUWP.Controls
 
         // Using a DependencyProperty as the backing store for X.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty XProperty =
-            DependencyProperty.Register("X", typeof(int), typeof(NumbersBoard), new PropertyMetadata(3));
+            DependencyProperty.Register("X", typeof(int), typeof(NumbersBoard), new PropertyMetadata(3, new PropertyChangedCallback(XChangedHandler)));
 
+        private static void XChangedHandler(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // TODO
+            (d as NumbersBoard).Initialize();
+        }
 
         public int Y
         {
@@ -48,7 +53,7 @@ namespace SudokuUWP.Controls
 
         // Using a DependencyProperty as the backing store for SelectedNumber.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedNumberProperty =
-            DependencyProperty.Register("SelectedNumber", typeof(int?), typeof(NumbersBoard), new PropertyMetadata(null));
+            DependencyProperty.Register("SelectedNumber", typeof(object), typeof(NumbersBoard), new PropertyMetadata(null));
 
 
         public double BoxWidth
@@ -83,17 +88,7 @@ namespace SudokuUWP.Controls
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register("FontSize", typeof(int), typeof(NumbersBoard), new PropertyMetadata(14));
 
-        public object SelectedParameter
-        {
-            get { return (object)GetValue(SelectedParameterProperty); }
-            set { SetValue(SelectedParameterProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for SelectedParameter.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SelectedParameterProperty =
-            DependencyProperty.Register("SelectedParameter", typeof(object), typeof(NumbersBoard), new PropertyMetadata(null));
-
-        public event Action<int?, object> Selected;
+        public event Action<int?> Selected;
 
         public NumbersBoard()
         {
@@ -102,6 +97,15 @@ namespace SudokuUWP.Controls
 
         private void NumbersBoard_Loaded(object sender, RoutedEventArgs e)
         {
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            this.Children.Clear();
+            RowDefinitions.Clear();
+            ColumnDefinitions.Clear();
+
             for (int i = 0; i <= Y; i++)
             {
                 RowDefinitions.Add(new RowDefinition()
@@ -143,14 +147,14 @@ namespace SudokuUWP.Controls
         private void ClearButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
             SelectedNumber = null;
-            Selected?.Invoke(null, SelectedParameter);
+            Selected?.Invoke(SelectedNumber);
         }
 
         private void Button_Tapped(object sender, TappedRoutedEventArgs e)
         {
             var button = sender as Button;
             SelectedNumber = Convert.ToInt32(button.Content);
-            Selected?.Invoke(SelectedNumber, SelectedParameter);
+            Selected?.Invoke(SelectedNumber);
         }
 
         private Button CreateButton(object content, bool isClearButton)
@@ -159,10 +163,11 @@ namespace SudokuUWP.Controls
             {
                 Content = content,
                 Margin = new Thickness(2),
+                Padding = new Thickness(0),
                 FontSize = this.FontSize,
                 Height = BoxHeight,
                 Background = new SolidColorBrush(),
-                BorderThickness = new Thickness(2),
+                BorderThickness = new Thickness(2)
             };
 
             if (isClearButton)

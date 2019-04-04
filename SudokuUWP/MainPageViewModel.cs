@@ -75,6 +75,24 @@ namespace SudokuUWP
         public bool IsPlaying => gameState == GameState.Playing;
 
 
+        private double boxWidth;
+
+        public double BoxWidth
+        {
+            get => boxWidth;
+            set
+            {
+                boxWidth = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(GameBoardWidth));
+                NotifyPropertyChanged(nameof(BoxFontSize));
+            }
+        }
+
+        public double GameBoardWidth => BoxWidth * Size;
+
+        public int BoxFontSize => (int)(BoxWidth * 2 / 3);
+
         public async void ValidateWhenChangeAt(BoxModel box)
         {
             bool isValid = gameLogic.ValidateWhenChangeAt(box);
@@ -106,6 +124,7 @@ namespace SudokuUWP
             if (await newGameDialog.ShowAsync() == ContentDialogResult.Primary)
             {
                 gameLogic = new GameLogic(newGameDialog.X, newGameDialog.Y, newGameDialog.Level);
+                UpdateBoxWidth();
                 StartNewGame();
                 NotifyPropertyChanged(nameof(X));
                 NotifyPropertyChanged(nameof(Y));
@@ -173,7 +192,7 @@ namespace SudokuUWP
             GameLevel level = GameLevel.Medium;
 
             gameLogic = new GameLogic(x, y, level);
-
+            UpdateBoxWidth();
             StartNewGame();
         }
 
@@ -231,6 +250,16 @@ namespace SudokuUWP
                 CloseButtonText = "OK"
             };
             await endGameDialog.ShowAsync();
+        }
+
+        private void UpdateBoxWidth()
+        {
+            BoxWidth = Utils.Utils.GetWindowSize() / Size;
+
+            foreach (var box in Boxes)
+            {
+                box.FontSize = BoxFontSize;
+            }
         }
     }
 

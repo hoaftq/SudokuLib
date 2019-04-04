@@ -2,7 +2,6 @@
     x:Class="SudokuUWP.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:SudokuUWP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:SudokuUWP.Controls"
@@ -19,6 +18,23 @@
             <Setter Property="Height" Value="80"/>
             <Setter Property="AllowFocusOnInteraction" Value="False"/>
         </Style>
+        <Flyout x:Key="numbersBoard" x:Name="numbersBoard">
+            <Flyout.FlyoutPresenterStyle>
+                <Style TargetType="FlyoutPresenter">
+                    <Setter Property="Opacity" Value="0.85"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Background" Value="LightGray"/>
+                </Style>
+            </Flyout.FlyoutPresenterStyle>
+            <controls:NumbersBoard X="{Binding X, Mode=OneWay}"
+                                   Y="{Binding Y, Mode=OneWay}"
+                                   SelectedNumber="{Binding DisplayValue, Mode=TwoWay}"
+                                   BoxWidth="{x:Bind ViewModel.BoxWidth, Mode=OneWay}"
+                                   BoxHeight="{x:Bind ViewModel.BoxWidth, Mode=OneWay}"
+                                   FontSize="{x:Bind ViewModel.BoxFontSize, Mode=OneWay}"
+                                   Selected="NumbersBoard_Selected">
+            </controls:NumbersBoard>
+        </Flyout>
     </Page.Resources>
     <RelativePanel>
         <GridView Name="gameBoard"
@@ -27,38 +43,21 @@
                   RelativePanel.AlignVerticalCenterWithPanel="True"
                   Padding="0"
                   SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
-                  IsHitTestVisible="{x:Bind ViewModel.IsPlaying, Mode=OneWay}">
+                  IsHitTestVisible="{x:Bind ViewModel.IsPlaying, Mode=OneWay}"
+                  Width="{x:Bind ViewModel.GameBoardWidth, Mode=OneWay}">
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:BoxModel">
-                    <controls:Box Value="{x:Bind Mode=TwoWay}" Tapped="Box_Tapped">
-                        <FlyoutBase.AttachedFlyout>
-                            <Flyout x:Name="numbersBoard">
-                                <Flyout.FlyoutPresenterStyle>
-                                    <Style TargetType="FlyoutPresenter">
-                                        <Setter Property="Opacity" Value="0.85"/>
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="Background" Value="LightGray"/>
-                                    </Style>
-                                </Flyout.FlyoutPresenterStyle>
-                                <controls:NumbersBoard X="{x:Bind X, Mode=OneWay}"
-                                                       Y="{x:Bind Y, Mode=OneWay}"
-                                                       SelectedNumber="{x:Bind DisplayValue, Mode=TwoWay}"
-                                                       BoxWidth="60"
-                                                       BoxHeight="60"
-                                                       FontSize="40"
-                                                       Selected="NumbersBoard_Selected"
-                                                       SelectedParameter="{Binding ElementName=numbersBoard}">
-                                </controls:NumbersBoard>
-                            </Flyout>
-                        </FlyoutBase.AttachedFlyout>
+                    <controls:Box Value="{x:Bind Mode=TwoWay}"
+                                  Tapped="Box_Tapped"
+                                  FlyoutBase.AttachedFlyout="{StaticResource numbersBoard}">
                     </controls:Box>
                 </DataTemplate>
             </GridView.ItemTemplate>
             <GridView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsWrapGrid MaximumRowsOrColumns="{Binding Size, Mode=OneWay}"
-                                   ItemHeight="60"
-                                   ItemWidth="60"
+                                   ItemHeight="{Binding BoxWidth, Mode=OneWay}"
+                                   ItemWidth="{Binding BoxWidth, Mode=OneWay}"
                                    Orientation="Horizontal"
                                    Loaded="ItemsWrapGrid_Loaded"
                                    Margin="0">
@@ -78,15 +77,14 @@
 
         <Grid RelativePanel.AlignHorizontalCenterWithPanel="True"
               RelativePanel.AlignVerticalCenterWithPanel="True"
-              Width="{Binding ActualWidth, ElementName=gameBoard}"
-              Height="{Binding ActualHeight, ElementName=gameBoard}"
+              Width="{x:Bind ViewModel.GameBoardWidth, Mode=OneWay}"
+              Height="{x:Bind ViewModel.GameBoardWidth, Mode=OneWay}"
               Visibility="{x:Bind ViewModel.PlayingVisibility, Mode=OneWay}"
               Background="LightGray">
             <TextBlock Text="Paused"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="50"
-                       Foreground="White"/>
+                       FontSize="50"/>
         </Grid>
 
         <StackPanel Name="supportArea"
@@ -174,7 +172,7 @@
                 </Button.Content>
             </Button>
         </RelativePanel>
-        
+
         <StackPanel RelativePanel.AlignBottomWithPanel="True"
                     RelativePanel.AlignRightWithPanel="True"
                     Orientation="Horizontal"

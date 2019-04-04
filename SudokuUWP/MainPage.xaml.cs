@@ -49,9 +49,9 @@ namespace SudokuUWP
         {
         }
 
-        private void NumbersBoard_Selected(int? selectedValue, object parameter)
+        private void NumbersBoard_Selected(int? selectedValue)
         {
-            (parameter as Flyout).Hide();
+            numbersBoard.Hide();
 
             var selectedBox = gameBoard.SelectedItem as BoxModel;
             ViewModel.ValidateWhenChangeAt(selectedBox);
@@ -59,6 +59,12 @@ namespace SudokuUWP
 
         private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            // TODO
+            if (!ViewModel.IsPlaying)
+            {
+                return;
+            }
+
             var selectedValue = gameBoard.SelectedItem as BoxModel;
             if (selectedValue == null)
             {
