@@ -12,9 +12,9 @@ namespace SudokuUWP.Logics
 {
     public class GameLogic
     {
-        private const int DEFAULT_THICKNESS = 1;
+        private const double DEFAULT_THICKNESS =1;
 
-        private const int BLOCK_THICKNESS = 2;
+        private const double BLOCK_THICKNESS = 2;
 
         private readonly Brush DarkBlockBrush = new SolidColorBrush(Color.FromArgb(255, 230, 230, 230));
 

@@ -6,6 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:SudokuUWP.Controls"
     xmlns:models="using:SudokuUWP.Models"
+    xmlns:utils="using:SudokuUWP.Utils"
+    xmlns:converters="using:SudokuUWP.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     DataContext="{x:Bind ViewModel, Mode=OneWay}"
@@ -14,8 +16,10 @@
 
     <Page.Resources>
         <Style TargetType="Button">
-            <Setter Property="Width" Value="100"/>
-            <Setter Property="Height" Value="80"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="70"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="0"/>
             <Setter Property="AllowFocusOnInteraction" Value="False"/>
         </Style>
         <Flyout x:Key="numbersBoard" x:Name="numbersBoard">
@@ -35,8 +39,41 @@
                                    Selected="NumbersBoard_Selected">
             </controls:NumbersBoard>
         </Flyout>
+        <converters:PlayingTimeConverter x:Key="playingTimeConverter"/>
     </Page.Resources>
-    <RelativePanel>
+
+    <RelativePanel Margin="2">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <utils:OrientationTrigger>
+                            <utils:OrientationTrigger.Orientations>
+                                <x:String>Portrait</x:String>
+                                <x:String>PortraitFlipped</x:String>
+                            </utils:OrientationTrigger.Orientations>
+                        </utils:OrientationTrigger>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="controlArea.(RelativePanel.LeftOf)" Value="{x:Null}"/>
+                        <Setter Target="controlArea.(RelativePanel.AlignTopWith)" Value="{x:Null}"/>
+                        <Setter Target="controlArea.(RelativePanel.AlignBottomWith)" Value="{x:Null}"/>
+                        <Setter Target="controlArea.(RelativePanel.Above)" Value="gameBoard"/>
+                        <Setter Target="controlArea.(RelativePanel.AlignTopWithPanel)" Value="True"/>
+                        <Setter Target="controlArea.Orientation" Value="Horizontal"/>
+                        <Setter Target="pauseButton.Margin" Value="0,5,5,5"/>
+
+                        <Setter Target="supportArea.(RelativePanel.RightOf)" Value="{x:Null}"/>
+                        <Setter Target="supportArea.(RelativePanel.AlignTopWith)" Value="{x:Null}"/>
+                        <Setter Target="supportArea.(RelativePanel.AlignBottomWith)" Value="{x:Null}"/>
+                        <Setter Target="supportArea.(RelativePanel.Below)" Value="gameBoard"/>
+                        <Setter Target="supportArea.Orientation" Value="Horizontal"/>
+                        <Setter Target="hintButton.Margin" Value="0,5,5,5"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <GridView Name="gameBoard"
                   ItemsSource="{x:Bind ViewModel.Boxes, Mode=OneWay}"
                   RelativePanel.AlignHorizontalCenterWithPanel="True"
@@ -67,6 +104,7 @@
             <GridView.ItemContainerStyle>
                 <Style TargetType="GridViewItem">
                     <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
                     <Setter Property="MinWidth" Value="0"/>
                     <Setter Property="MinHeight" Value="0"/>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -90,9 +128,8 @@
         <StackPanel Name="supportArea"
                     RelativePanel.RightOf="gameBoard"
                     RelativePanel.AlignTopWith="gameBoard"
-                    RelativePanel.AlignBottomWith="gameBoard"
-                    Margin="10,0,0,0">
-            <Button Margin="0,0,0,5"
+                    RelativePanel.AlignBottomWith="gameBoard">
+            <Button Name="hintButton"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     Command="{x:Bind ViewModel.HintCommand}"
@@ -114,76 +151,64 @@
                 <Button.Content>
                     <StackPanel>
                         <SymbolIcon Symbol="ViewAll"/>
-                        <TextBlock Text="Solve game"/>
+                        <TextBlock Text="Solve"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
         </StackPanel>
 
-        <RelativePanel Name="controlArea"
+        <StackPanel Name="controlArea"
                        RelativePanel.LeftOf="gameBoard"
                        RelativePanel.AlignTopWith="gameBoard"
-                       RelativePanel.AlignBottomWith="gameBoard"
-                       Margin="0,0,10,0">
-            <Button RelativePanel.AlignTopWithPanel="True"
-                    RelativePanel.AlignLeftWithPanel="True"
+                       RelativePanel.AlignBottomWith="gameBoard">
+            <Button Name="pauseButton"
                     FontSize="20"
                     Command="{x:Bind ViewModel.PauseCommand}"
                     IsEnabled="{x:Bind ViewModel.IsPauseOrPlaying, Mode=OneWay}">
                 <Button.Content>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Text="{x:Bind ViewModel.PlayingTime, Mode=OneWay, Converter={StaticResource playingTimeConverter}}"
+                                   Foreground="Blue"/>
                         <SymbolIcon Symbol="Pause"
                                     Visibility="{x:Bind ViewModel.PauseVisibility, Mode=OneWay}"/>
                         <SymbolIcon Symbol="Play"
                                     Visibility="{x:Bind ViewModel.PlayingVisibility, Mode=OneWay}"/>
-                        <TextBlock Text="{x:Bind ViewModel.UsedTime, Mode=OneWay}"
-                                   Foreground="Blue"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Name="newBtn"
-                    RelativePanel.Above="levelBtn"
-                    Margin="0,0,0,5"
-                    Command="{x:Bind ViewModel.NewGameCommand}">
+            <Button Command="{x:Bind ViewModel.NewGameCommand}">
                 <Button.Content>
                     <StackPanel>
                         <SymbolIcon Symbol="Refresh"/>
-                        <TextBlock Text="New"/>
+                        <TextBlock Text="Refresh"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
-            <Button Name="levelBtn"
-                    RelativePanel.Above="newGameBtn"
-                    Margin="0,0,0,5"
-                    Content="{x:Bind ViewModel.Level, Mode=OneWay}">
+            <Button Content="{x:Bind ViewModel.Level, Mode=OneWay}">
                 <Button.Flyout>
                     <MenuFlyout x:Name="levelMenu" Placement="Right"/>
                 </Button.Flyout>
             </Button>
-            <Button Name="newGameBtn"
-                    RelativePanel.AlignBottomWithPanel="True"
-                    Margin="0,0,0,5"
-                    Command="{x:Bind ViewModel.NewGameWithOptionsCommand}">
+            <Button Command="{x:Bind ViewModel.NewGameWithOptionsCommand}">
                 <Button.Content>
                     <StackPanel>
                         <SymbolIcon Symbol="Add"/>
-                        <TextBlock Text="New game"/>
+                        <TextBlock Text="New"/>
                     </StackPanel>
                 </Button.Content>
             </Button>
-        </RelativePanel>
+        </StackPanel>
 
         <StackPanel RelativePanel.AlignBottomWithPanel="True"
                     RelativePanel.AlignRightWithPanel="True"
-                    Orientation="Horizontal"
                     Margin="0,0,5,0">
-            <TextBlock Text="@hoaftq. This is an open source"
+            <TextBlock Text="Sudoku @hoaftq"
                        Foreground="DarkGray"
-                       VerticalAlignment="Center"
-                       Margin="0,0,5,0"/>
+                       HorizontalAlignment="Right"/>
             <HyperlinkButton NavigateUri="https://github.com/hoaftq/SudokuLib"
-                             Content="project"
-                             VerticalAlignment="Bottom"/>
+                             Content="Source code"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Right"/>
         </StackPanel>
     </RelativePanel>
 </Page>

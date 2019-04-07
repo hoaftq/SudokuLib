@@ -82,16 +82,25 @@ namespace SudokuUWP
                 selectedValue.DisplayValue = null;
             }
 
-            // Pressed key is not a valid digit then ignore it
-            if (e.Key <= VirtualKey.Number0 || e.Key > VirtualKey.Number0 + ViewModel.Size)
+            int digit = e.Key - VirtualKey.Number0;
+
+            // Pressed key which is not a digit then ignore it
+            if (digit < 0 || digit > 9 || digit > ViewModel.Size)
             {
                 return;
             }
 
-            // Store the valid digit
-            selectedValue.DisplayValue = e.Key - VirtualKey.Number0;
+            var newValue = digit + (selectedValue?.DisplayValue ?? 0) * 10;
+            if (newValue > ViewModel.Size)
+            {
+                newValue = digit;
+            }
 
-            ViewModel.ValidateWhenChangeAt(selectedValue);
+            if (newValue != 0)
+            {
+                selectedValue.DisplayValue = newValue;
+                ViewModel.ValidateWhenChangeAt(selectedValue);
+            }
         }
     }
 }

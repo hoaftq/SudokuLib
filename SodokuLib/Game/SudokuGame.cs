@@ -39,7 +39,7 @@ namespace SudokuLib.Game
             ValidateDimensionParam(row, nameof(row));
             ValidateDimensionParam(col, nameof(col));
 
-            return ValidateRow(row) && ValidateColumn(col) && ValidateBlockContains(row, col);
+            return ValidateRow(row) & ValidateColumn(col) & ValidateBlockContains(row, col);
         }
 
         private bool ResultHandler(int[][] result)
@@ -56,6 +56,7 @@ namespace SudokuLib.Game
                     box.Value = value;
                     box.DisplayValue = mask[i][j] ? (int?)value : null;
                     box.IsFixed = mask[i][j];
+                    box.IsInvalidBlock = box.IsInvalidCol = box.IsInvalidRow = false;
                 }
             }
 

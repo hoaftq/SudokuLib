@@ -98,16 +98,9 @@ namespace SudokuLib.Game
             {
                 if (dirtyBoxes[i].DisplayValue == dirtyBoxes[i + 1].DisplayValue)
                 {
-                    if (!dirtyBoxes[i].IsFixed)
-                    {
-                        invalidAction(dirtyBoxes[i]);
-                    }
-
-                    if (!dirtyBoxes[i + 1].IsFixed)
-                    {
-                        invalidAction(dirtyBoxes[i + 1]);
-                        isValid = false;
-                    }
+                    invalidAction(dirtyBoxes[i]);
+                    invalidAction(dirtyBoxes[i + 1]);
+                    isValid = false;
                 }
             }
 

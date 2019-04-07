@@ -51,18 +51,16 @@ namespace SudokuUWP
 
         public bool IsHintEnabled => IsPlaying && !(SelectedItem?.IsFixed ?? true);
 
-        private TimeSpan usedTime = TimeSpan.Zero;
+        private TimeSpan playingTime = TimeSpan.Zero;
 
-        public string UsedTime
+        public TimeSpan PlayingTime
         {
-            get
-            {
-                if (usedTime.Hours == 0)
-                {
-                    return $"{usedTime.Minutes:00}:{usedTime.Seconds:00}";
-                }
+            get => playingTime;
 
-                return $"{usedTime.Hours}:{usedTime.Minutes:00}:{usedTime.Seconds:00}";
+            set
+            {
+                playingTime = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -124,7 +122,7 @@ namespace SudokuUWP
             if (await newGameDialog.ShowAsync() == ContentDialogResult.Primary)
             {
                 gameLogic = new GameLogic(newGameDialog.X, newGameDialog.Y, newGameDialog.Level);
-                UpdateBoxWidth();
+                UpdateBoxSize();
                 StartNewGame();
                 NotifyPropertyChanged(nameof(X));
                 NotifyPropertyChanged(nameof(Y));
@@ -192,7 +190,7 @@ namespace SudokuUWP
             GameLevel level = GameLevel.Medium;
 
             gameLogic = new GameLogic(x, y, level);
-            UpdateBoxWidth();
+            UpdateBoxSize();
             StartNewGame();
         }
 
@@ -208,14 +206,12 @@ namespace SudokuUWP
 
         private void Timer_Tick(object sender, object e)
         {
-            usedTime = usedTime.Add(TimeSpan.FromSeconds(1));
-            NotifyPropertyChanged(nameof(UsedTime));
+            PlayingTime = PlayingTime.Add(TimeSpan.FromSeconds(1));
         }
 
         private void StartNewGame(GameLevel? level = null)
         {
-            usedTime = TimeSpan.Zero;
-            NotifyPropertyChanged(nameof(UsedTime));
+            PlayingTime = TimeSpan.Zero;
 
             gameLogic.NewGame(level);
             ChangeGameState(GameState.Playing);
@@ -252,9 +248,9 @@ namespace SudokuUWP
             await endGameDialog.ShowAsync();
         }
 
-        private void UpdateBoxWidth()
+        private void UpdateBoxSize()
         {
-            BoxWidth = Utils.Utils.GetWindowSize() / Size;
+            BoxWidth = (int)(Utils.Utils.GetWindowSize() / Size);
 
             foreach (var box in Boxes)
             {

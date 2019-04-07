@@ -18,6 +18,8 @@ namespace SudokuUWP.Controls
 
         private readonly Brush SelectedBorderBrush = new SolidColorBrush(Colors.DarkBlue);
 
+        private readonly Brush ForegroundBrush = new SolidColorBrush(Colors.Black);
+
         public int X
         {
             get { return (int)GetValue(XProperty); }
@@ -167,7 +169,8 @@ namespace SudokuUWP.Controls
                 FontSize = this.FontSize,
                 Height = BoxHeight,
                 Background = new SolidColorBrush(),
-                BorderThickness = new Thickness(2)
+                BorderThickness = new Thickness(2),
+                Foreground = ForegroundBrush
             };
 
             if (isClearButton)
