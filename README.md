@@ -130,3 +130,6 @@ Project SudokuLib is a library containing 2 namespaces whose classes can be used
 There is also a complete Sudoku game based on this library SudokuUWP written using UWP. It is using SudokuGame class for backing process. Here is a screenshot of it
 
 ![Sudoku game screenshot](SudokuUWP-screenshot.png)
+
+## To-do list
+- [ ] Develope a game solver UI
