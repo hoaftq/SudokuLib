@@ -1,8 +1,7 @@
 ## SudokuLib
-A Sudoku library, which targets .NET Standard 1.0, supports generating game boards
+A Sudoku library, which targets .NET Standard, supports generating and solving game boards
 
-Project SudokuLib contains 2 namespaces whose classes can be used directly depending on your purpose
-
+The library is project SudokuLib which contains 2 namespaces whose classes can be used directly depending on your purpose
 ### 1. Sudoku.Generator namespace
   This is the low level library. It has a generator which can be used to generate new game boards and a solver which can be used to solve game boards with pre-filled values. 
   Both are derived from a generator base GeneratorBase. This is where the backtracking algorithm implemented. You can use this part of the library to develop your own game or a game solver.
@@ -40,11 +39,12 @@ Project SudokuLib contains 2 namespaces whose classes can be used directly depen
     | **4** | **3** | **2** | **1** |
 
     When using SudokuGenerator.GetPermuation you will get an permuation of the set [1, 2, 3, 4], let say [2 4 1 3]  
-    That means we will transform our game board with this map  
-        1 -> 2  
-        2 -> 4  
-        3 -> 1  
-        4 -> 3  
+    That means we will transform our game board with this map
+
+        1 ⟶ 2  
+        2 ⟶ 4  
+        3 ⟶ 1  
+        4 ⟶ 3  
     Now we have another gameboard 
     | 2 | 4 | 1 | 3 |
     |---|---|---|---|
@@ -121,5 +121,13 @@ Project SudokuLib contains 2 namespaces whose classes can be used directly depen
 ### 2. SudokuLib.Game namespace
   This is a higher level of the library and it uses Sudoku.Generator. It is like back-end of the game, almost forms a game without a view. 
   If you use these classes there, you just need to implement your own game view.
+  
+  Currently it has 4 classes
+  - Enum GameLevel represents game levels
+  - GameBox a box which is coressponding to a number in the game board
+  - GameBoard provide basic operations to the game board
+  - SudokuGame inherits functionality from GameBoard and uses a SudokuGenerator to generate game board
 
-There is also a complete Sudoku game based on this library SudokuUWP. This game is written using UWP so it can be used on every Windows devices.
+## SudokuUWP
+There is also a complete Sudoku game based on this library SudokuUWP written using UWP. It is using SudokuGame class for backing process. Here is a screenshot of it  
+<img src="SudokuUWP-screenshot.png">
